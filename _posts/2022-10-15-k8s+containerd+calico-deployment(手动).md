@@ -1,7 +1,7 @@
 ---
 
 layout: post
-title:  "k8s集群部署实践(手动)"
+title:  "k8s+containerd+calico-deployment(手动)"
 date:   2022-10-15 12:00:00 +0800
 categories: kubernetes
 

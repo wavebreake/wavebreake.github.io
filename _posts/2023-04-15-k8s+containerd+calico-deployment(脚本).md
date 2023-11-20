@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "k8s集群部署实践(脚本)"
+title:  "k8s+containerd+calico-deployment(脚本)"
 date:   2023-04-15 12:00:00 +0800
 categories: kubernetes
 ---
