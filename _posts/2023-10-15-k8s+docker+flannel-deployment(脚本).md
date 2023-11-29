@@ -49,7 +49,7 @@ categories: kubernetes
     - name: modprobe overlay;modprobe br_netfilter
       become: true
       shell: modprobe overlay;modprobe br_netfilter
-        
+
     - name: /etc/sysctl.d/k8s.conf
       become: true
       blockinfile:
@@ -76,6 +76,7 @@ categories: kubernetes
 - name: container-runtimes-deployment
   hosts: k8s
   gather_facts: no
+
   tasks:
     - name: apt remove docker.io
       become: true
