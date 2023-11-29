@@ -1,5 +1,4 @@
 ---
-
 layout: post
 title:  "k8s+containerd+calico-deployment(手动)"
 date:   2022-10-15 12:00:00 +0800
@@ -74,10 +73,9 @@ vim /etc/containerd/config.toml
 # vim /etc/systemd/system/containerd.service.d/http-proxy.conf
 
 # [Service]
-# Environment="HTTPS_PROXY=http://192.168.191.1:7890"
-# Environment="HTTP_PROXY=http://192.168.191.1:7890"
-# Environment="ALL_PROXY=socks5://192.168.191.1:7890"
-# Environment="NO_PROXY=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+# Environment="HTTP_PROXY=http://172.21.40.19:7890"
+# Environment="HTTPS_PROXY=http://172.21.40.19:7890"
+# Environment="NO_PROXY=localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
 systemctl daemon-reload
 systemctl restart containerd

@@ -15,6 +15,10 @@ categories: kubernetes
 - name: container-runtimes-download
   hosts: masters
   gather_facts: no
+  environment:
+    http_proxy: http://172.21.40.19:7890
+    https_proxy: http://172.21.40.19:7890
+    no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16  
 
   vars:
     CRICTL_VERSION: "v1.27.0"
@@ -32,92 +36,66 @@ categories: kubernetes
       get_url:
         url: https://github.com/containerd/containerd/releases/download/v1.7.3/containerd-1.7.3-linux-amd64.tar.gz
         dest: /root/1/containerd-linux-amd64.tar.gz
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload containerd.service
       get_url:
         url: https://raw.githubusercontent.com/containerd/containerd/main/containerd.service
         dest: /root/1/containerd.service
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload runc
       get_url:
         url: https://github.com/opencontainers/runc/releases/download/v1.1.8/runc.amd64
         dest: /root/1
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload cni
       get_url:
         url: https://github.com/containernetworking/plugins/releases/download/v1.3.0/cni-plugins-linux-amd64-v1.3.0.tgz
         dest: /root/1/cni-plugins-linux-amd64.tgz
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload crictl
       get_url:
         url: https://github.com/kubernetes-sigs/cri-tools/releases/download/{{CRICTL_VERSION}}/crictl-{{CRICTL_VERSION}}-linux-{{ARCH}}.tar.gz
         dest: /root/1/crictl-linux-amd64.tar.gz
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload kubeadm
       get_url:
         url: https://dl.k8s.io/release/{{RELEASE}}/bin/linux/{{ARCH}}/kubeadm
         dest: /root/1
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload kubelet
       get_url:
         url: https://dl.k8s.io/release/{{RELEASE}}/bin/linux/{{ARCH}}/kubelet
         dest: /root/1
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload kubelet.service
       get_url:
         url: https://raw.githubusercontent.com/kubernetes/release/{{RELEASE_VERSION}}/cmd/kubepkg/templates/latest/deb/kubelet/lib/systemd/system/kubelet.service
         dest: /root/1
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload 10-kubeadm.conf
       get_url:
         url: https://raw.githubusercontent.com/kubernetes/release/{{RELEASE_VERSION}}/cmd/kubepkg/templates/latest/deb/kubeadm/10-kubeadm.conf
         dest: /root/1
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload kubectl
       get_url:
         url: https://dl.k8s.io/release/{{RELEASE}}/bin/linux/{{ARCH}}/kubectl
         dest: /root/1
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload tigera-operator.yaml
       get_url:
         url: https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/tigera-operator.yaml
         dest: /root/1
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload custom-resources.yaml
       get_url:
         url: https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/custom-resources.yaml
         dest: /root/1
-      environment:
-        https_proxy: http://127.0.0.1:8118
 
     - name: donwload calicoctl
       get_url:
         url: https://github.com/projectcalico/calico/releases/latest/download/calicoctl-linux-amd64
         dest: /root/1/calicoctl
-      environment:
-        https_proxy: http://127.0.0.1:8118
 ```
 
 # init linux
@@ -126,6 +104,10 @@ categories: kubernetes
 - name: container-runtimes-prerequisites
   hosts: k8s
   gather_facts: no
+  environment:
+    http_proxy: http://172.21.40.19:7890
+    https_proxy: http://172.21.40.19:7890
+    no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
   tasks:
     - name: 即时生效
       shell: setenforce 0;swapoff -a
@@ -170,6 +152,16 @@ categories: kubernetes
 
     - name: apt autoremove -y
       shell: apt autoremove -y
+
+    - name: install socat
+      apt:
+        name: socat 
+        state: present
+
+    - name: install conntrack
+      apt:
+        name: conntrack
+        state: present
 ```
 
 # deploy container-runtimes
@@ -178,7 +170,10 @@ categories: kubernetes
 - name: container-runtimes-deployment
   hosts: k8s
   gather_facts: no
-
+  environment:
+    http_proxy: http://172.21.40.19:7890
+    https_proxy: http://172.21.40.19:7890
+    no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
   tasks:
     - name: copy containerd
       copy:
@@ -266,18 +261,11 @@ categories: kubernetes
 - name: kubeadm-deployment
   hosts: k8s
   gather_facts: no
-
+  environment:
+    http_proxy: http://172.21.40.19:7890
+    https_proxy: http://172.21.40.19:7890
+    no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
   tasks:
-#    - name: Add Kubernetes apt key
-#      apt_key:
-#        url: https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg
-#        state: present
-
-#    - name: Add Kubernetes apt repository
-#      apt_repository:
-#        repo: deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
-#        state: 
-
     - name: copy crictl
       copy:
         src: /root/1/crictl-linux-amd64.tar.gz
@@ -367,25 +355,32 @@ categories: kubernetes
 - name: kubeadm-init
   hosts: masters
   gather_facts: no
-
-  tasks:
-    - name: install socat
-      apt:
-        name: socat 
-        state: present
-
-    - name: install conntrack
-      apt:
-        name: conntrack
-        state: present
-    
+  environment:
+    http_proxy: http://172.21.40.19:7890
+    https_proxy: http://172.21.40.19:7890
+    no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:    
     - name: Initialize Kubernetes master
       command: kubeadm init --pod-network-cidr=10.244.0.0/16 --image-repository registry.cn-hangzhou.aliyuncs.com/google_containers
       register: kubeadm_output
 
     - debug:
         var: kubeadm_output
+```
 
+# calico-deployment
+
+```
+- name: calico-deployment
+  hosts: masters
+  gather_facts: no
+  environment:
+    http_proxy: http://172.21.40.19:7890
+    https_proxy: http://172.21.40.19:7890
+    no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
     - name: copy tigera-operator.yaml
       copy:
         src: /root/1/tigera-operator.yaml
@@ -393,8 +388,6 @@ categories: kubernetes
 
     - name: Install tigera-operator 
       command: kubectl create -f tigera-operator.yaml
-      environment:
-        KUBECONFIG: /etc/kubernetes/admin.conf
 
     - name: copy custom-resources.yaml
       copy:
@@ -415,8 +408,6 @@ categories: kubernetes
 
     - name: Install custom-resources.yaml
       command: kubectl create -f custom-resources.yaml
-      environment:
-        KUBECONFIG: /etc/kubernetes/admin.conf
 
     - name: copy calicoctl
       copy:
@@ -432,67 +423,5 @@ categories: kubernetes
 # join k8s
 
 ```
-- name: kubeadm-init
-  hosts: masters
-  gather_facts: no
 
-  tasks:
-    - name: install socat
-      apt:
-        name: socat 
-        state: present
-
-    - name: install conntrack
-      apt:
-        name: conntrack
-        state: present
-    
-    - name: Initialize Kubernetes master
-      command: kubeadm init --pod-network-cidr=10.244.0.0/16 --image-repository registry.cn-hangzhou.aliyuncs.com/google_containers
-      register: kubeadm_output
-
-    - debug:
-        var: kubeadm_output
-
-    - name: copy tigera-operator.yaml
-      copy:
-        src: /root/1/tigera-operator.yaml
-        dest: /root
-
-    - name: Install tigera-operator 
-      command: kubectl create -f tigera-operator.yaml
-      environment:
-        KUBECONFIG: /etc/kubernetes/admin.conf
-
-    - name: copy custom-resources.yaml
-      copy:
-        src: /root/1/custom-resources.yaml
-        dest: /root
-
-    - name: /root/custom-resources.yaml
-      lineinfile:
-        dest: /root/custom-resources.yaml
-        regexp: "^      cidr:"
-        line: "      cidr: 10.244.0.0/16"
-
-    - name: /root/custom-resources.yaml
-      lineinfile:
-        dest: /root/custom-resources.yaml
-        regexp: "^      encapsulation: VXLANCrossSubnet"
-        line: "      encapsulation: None"
-
-    - name: Install custom-resources.yaml
-      command: kubectl create -f custom-resources.yaml
-      environment:
-        KUBECONFIG: /etc/kubernetes/admin.conf
-
-    - name: copy calicoctl
-      copy:
-        src: /root/1/calicoctl
-        dest: /root
-
-    - name: chmod calicoctl
-      file: 
-        dest: /root/calicoctl
-        mode: +x
 ```

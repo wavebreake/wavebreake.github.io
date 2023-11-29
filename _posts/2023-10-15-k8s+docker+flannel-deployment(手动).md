@@ -89,14 +89,12 @@ systemctl restart cri-docker
 # deploy kubeadm、kubelet、kubectl
 
 ```
-sudo apt update
-# apt-transport-https 可能是一个虚拟包（dummy package）；如果是的话，你可以跳过安装这个包
-sudo apt install -y apt-transport-https ca-certificates curl
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
 
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-# 此操作会覆盖 /etc/apt/sources.list.d/kubernetes.list 中现存的所有配置。
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 sudo apt update
 sudo apt install -y kubelet kubeadm kubectl
@@ -108,26 +106,14 @@ sudo apt-mark hold kubelet kubeadm kubectl
 ```
 kubeadm config images pull --image-repository registry.cn-hangzhou.aliyuncs.com/google_containers
 
-kubeadm init --pod-network-cidr=10.244.0.0/16 --image-repository registry.cn-hangzhou.aliyuncs.com/google_containers
+kubeadm init --pod-network-cidr=10.244.0.0/16 --cri-socket=unix:///var/run/cri-dockerd.sock
 
 echo 'source <(kubectl completion bash)' >>~/.bashrc
 echo 'alias k=kubectl' >>~/.bashrc
 echo 'complete -o default -F __start_kubectl k' >>~/.bashrc
 source ~/.bashrc
 
-wget https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/tigera-operator.yaml
-
-kubectl create -f tigera-operator.yaml
-
-wget https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/custom-resources.yaml
-
-vim custom-resources.yaml
-
-kubectl create -f custom-resources.yaml
-
-curl -L https://github.com/projectcalico/calico/releases/latest/download/calicoctl-linux-amd64 -o calicoctl
-
-chmod +x ./calicoctl
+kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
 ```
 
 # join k8s

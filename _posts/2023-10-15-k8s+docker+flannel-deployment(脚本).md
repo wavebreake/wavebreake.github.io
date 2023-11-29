@@ -15,6 +15,10 @@ categories: kubernetes
 - name: container-runtimes-prerequisites
   hosts: k8s
   gather_facts: no
+  environment:
+    http_proxy: http://172.21.40.19:7890
+    https_proxy: http://172.21.40.19:7890
+    no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
   tasks:
     - name: setenforce 0;swapoff -a
       become: true
@@ -193,16 +197,14 @@ categories: kubernetes
         create: yes
         block: |
           [Service]
-          Environment="HTTP_PROXY=http://127.0.0.1:7890"
-          Environment="HTTPS_PROXY=http://127.0.0.1:7890"
+          Environment="HTTP_PROXY=http://172.21.40.19:7890"
+          Environment="HTTPS_PROXY=http://172.21.40.19:7890"
           Environment="NO_PROXY=localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
     - name: donwload cri-dockerd.deb
       get_url:
         url: https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.4/cri-dockerd_0.3.4.3-0.ubuntu-jammy_amd64.deb
         dest: /home/wavebreak/cri-dockerd.deb
-      environment:
-        https_proxy: http://127.0.0.1:7890
 
     - name: apt install cri-dockerd.deb
       become: true
@@ -221,8 +223,6 @@ categories: kubernetes
       get_url:
         url: https://github.com/containernetworking/plugins/releases/download/v1.3.0/cni-plugins-linux-amd64-v1.3.0.tgz
         dest: /home/wavebreak/cni-plugins.tgz
-      environment:
-        https_proxy: http://127.0.0.1:7890
 
     - name: mkdir -p /opt/cni/bin
       become: true
@@ -261,6 +261,10 @@ categories: kubernetes
 - name: kube-deployment
   hosts: k8s
   gather_facts: no
+  environment:
+    http_proxy: http://172.21.40.19:7890
+    https_proxy: http://172.21.40.19:7890
+    no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
   tasks:
     - name: apt install apt-transport-https
       become: true
@@ -268,19 +272,19 @@ categories: kubernetes
         name: apt-transport-https
         state: present
 
-    - name: curl -fsSL https://dl.k8s.io/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+    - name: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
       become: true
       ansible.builtin.apt_key:
-        url: https://dl.k8s.io/apt/doc/apt-key.gpg
+        url: https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key
         keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
-    - name: echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+    - name: echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
       become: true
       blockinfile:
         path:  /etc/apt/sources.list.d/kubernetes.list
         create: yes
         block: |
-          deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
+          deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /
 
     - name: apt update
       become: true
@@ -327,73 +331,44 @@ categories: kubernetes
 # init k8s
 
 ```
+- name: kubeadm init
+  hosts: masters
+  gather_facts: no
+  environment:
+    http_proxy: http://172.21.40.19:7890
+    https_proxy: http://172.21.40.19:7890
+    no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+  tasks:    
+    - name: kubeadm init --pod-network-cidr=10.244.0.0/16 --cri-socket=unix:///var/run/cri-dockerd.sock
+      become: true
+      command: kubeadm init --pod-network-cidr=10.244.0.0/16 --cri-socket=unix:///var/run/cri-dockerd.sock
+      register: kubeadm_output
 
+    - debug:
+        var: kubeadm_output
+```
+
+# flannel-deployment
+
+```
+- name: flannel-deployment
+  hosts: masters
+  gather_facts: no
+  environment:
+    http_proxy: http://172.21.40.19:7890
+    https_proxy: http://172.21.40.19:7890
+    no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+    - name: flannel-deployment
+      become: true
+      kubernetes.core.k8s:
+        state: present
+        src: https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
 ```
 
 # join k8s
 
 ```
-- name: kubeadm-init
-  hosts: masters
-  gather_facts: no
 
-  tasks:
-    - name: install socat
-      apt:
-        name: socat 
-        state: present
-
-    - name: install conntrack
-      apt:
-        name: conntrack
-        state: present
-
-    - name: Initialize Kubernetes master
-      command: kubeadm init --pod-network-cidr=10.244.0.0/16 --image-repository registry.cn-hangzhou.aliyuncs.com/google_containers
-      register: kubeadm_output
-
-    - debug:
-        var: kubeadm_output
-
-    - name: copy tigera-operator.yaml
-      copy:
-        src: /root/1/tigera-operator.yaml
-        dest: /root
-
-    - name: Install tigera-operator 
-      command: kubectl create -f tigera-operator.yaml
-      environment:
-        KUBECONFIG: /etc/kubernetes/admin.conf
-
-    - name: copy custom-resources.yaml
-      copy:
-        src: /root/1/custom-resources.yaml
-        dest: /root
-
-    - name: /root/custom-resources.yaml
-      lineinfile:
-        dest: /root/custom-resources.yaml
-        regexp: "^      cidr:"
-        line: "      cidr: 10.244.0.0/16"
-
-    - name: /root/custom-resources.yaml
-      lineinfile:
-        dest: /root/custom-resources.yaml
-        regexp: "^      encapsulation: VXLANCrossSubnet"
-        line: "      encapsulation: None"
-
-    - name: Install custom-resources.yaml
-      command: kubectl create -f custom-resources.yaml
-      environment:
-        KUBECONFIG: /etc/kubernetes/admin.conf
-
-    - name: copy calicoctl
-      copy:
-        src: /root/1/calicoctl
-        dest: /root
-
-    - name: chmod calicoctl
-      file: 
-        dest: /root/calicoctl
-        mode: +x
 ```
