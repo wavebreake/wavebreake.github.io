@@ -76,7 +76,10 @@ categories: kubernetes
 - name: container-runtimes-deployment
   hosts: k8s
   gather_facts: no
-
+  environment:
+    http_proxy: http://172.21.40.19:7890
+    https_proxy: http://172.21.40.19:7890
+    no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
   tasks:
     - name: apt remove docker.io
       become: true
