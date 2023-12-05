@@ -220,8 +220,8 @@ categories: kubernetes
       become: true
       lineinfile:
         dest: /lib/systemd/system/cri-docker.service
-        regexp: "ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock"
-        line: "ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock --pod-infra-container-image=registry.k8s.io/pause:3.9"
+        regexp: "ExecStart=/usr/bin/cri-dockerd --container-runtime-endpoint fd://"
+        line: "ExecStart=/usr/bin/cri-dockerd --container-runtime-endpoint fd:// --pod-infra-container-image=registry.k8s.io/pause:3.9"
 
     - name: donwload cni-plugins.tgz
       get_url:
