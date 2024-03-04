@@ -57,16 +57,51 @@ e.g.
 
 # 安装MinIO
 
+Download the MinIO Object
+
 ```
-mkdir -p ~/minio/data
-podman run \
-  --network kind \
-  -p 9000:9000 \
-  -p 9001:9001 \
-  -v ~/minio/data:/data \
-  -e "MINIO_ROOT_USER=ROOTNAME" \
-  -e "MINIO_ROOT_PASSWORD=CHANGEME123" \
-  quay.io/minio/minio server /data --console-address ":9001"
+curl https://raw.githubusercontent.com/minio/docs/master/source/extra/examples/minio-dev.yaml -O
+```
+
+修改minio-dev.yaml
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: minio
+  name: minio
+  namespace: minio-dev # Change this value to match the namespace metadata.name
+spec:
+  containers:
+  - name: minio
+    image: quay.io/minio/minio:latest
+    command:
+    - /bin/bash
+    - -c
+    args:
+    - minio server /data --console-address :9090
+    volumeMounts:
+    - mountPath: /data
+      name: localvolume # Corresponds to the `spec.volumes` Persistent Volume
+  volumes:
+  - name: localvolume
+    hostPath: # MinIO generally recommends using locally-attached volumes
+      path: /data # Specify a path to a local drive or volume on the Kubernetes worker node
+      type: DirectoryOrCreate # The path to the last directory must exist
+```
+
+Apply the MinIO Object Definition
+
+```
+kubectl apply -f minio-dev.yaml
+```
+
+Temporarily Access the MinIO S3 API and Console
+
+```
+kubectl port-forward pod/minio 9000 9090 -n minio-dev
 ```
 
 # 使用minio
@@ -74,5 +109,15 @@ podman run \
 Connect your Browser to the MinIO Server
 
 ```
-http://127.0.0.1:9000
+http://127.0.0.1:9090
+minioadmin | minioadmin
+```
+
+![](https://raw.githubusercontent.com/wavebreake/imagehosting/main/minio.png)
+
+Connect the MinIO Client
+
+```
+mc alias set k8s-minio-dev http://127.0.0.1:9000 minioadmin minioadmin
+mc admin info k8s-minio-dev
 ```
