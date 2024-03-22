@@ -2,7 +2,7 @@
 layout: post
 title:  "nacos-practice"
 date:   2024-01-26 12:00:00 +0800
-categories: nacos
+categories: kubernetes
 ---
 
 # 使用Podman on Mac安装kind

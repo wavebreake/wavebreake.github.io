@@ -2,7 +2,7 @@
 layout: post
 title:  "jsontoexcel"
 date:   2024-02-29 12:00:00 +0800
-categories: json
+categories: linux
 ---
 
 # 使用pandas将json解析成excel

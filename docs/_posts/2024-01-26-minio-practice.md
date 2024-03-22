@@ -2,7 +2,7 @@
 layout: post
 title:  "minio-practice"
 date:   2024-01-26 12:00:00 +0800
-categories: minio
+categories: kubernetes
 ---
 
 # 使用Podman on Mac安装kind

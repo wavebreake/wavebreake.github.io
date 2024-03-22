@@ -2,7 +2,7 @@
 layout: post
 title:  "EFK-practice"
 date:   2024-03-13 12:00:00 +0800
-categories: EFK
+categories: kubernetes
 ---
 
 # 安装NFS
@@ -196,13 +196,13 @@ password: kubectl get secret quickstart-es-elastic-user -o=jsonpath='{.data.elas
 
 # 生产建议:filebeat->Kafka->logstash->elastic search->kibana
 
-安装ECK
+安装ECK,参考
 
-参考[EFK-practice | 共倒金荷家万里](https://wavebreake.github.io/efk/2024/03/13/EFK-practice.html)
+[EFK-practice | 共倒金荷家万里](https://wavebreake.github.io/efk/2024/03/13/EFK-practice.html)
 
-安装kafka
+安装kafka,参考
 
-参考[strimzi-practice | 共倒金荷家万里](https://wavebreake.github.io/kafka/2024/03/13/strimzi-practice.html)
+[strimzi-practice | 共倒金荷家万里](https://wavebreake.github.io/kafka/2024/03/13/strimzi-practice.html)
 
 安装filebeat
 

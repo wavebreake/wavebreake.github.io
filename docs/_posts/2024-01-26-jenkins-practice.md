@@ -2,7 +2,7 @@
 layout: post
 title:  "jenkins-practice"
 date:   2024-01-26 12:00:00 +0800
-categories: jenkins
+categories: kubernetes
 ---
 
 # 使用Docker Desktop安装kind

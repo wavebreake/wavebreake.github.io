@@ -2,7 +2,7 @@
 layout: post
 title:  "strimzi-practice"
 date:   2024-03-13 12:00:00 +0800
-categories: kafka
+categories: kubernetes
 ---
 
 # 使用strimz部署kafka

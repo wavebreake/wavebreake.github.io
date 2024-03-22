@@ -2,7 +2,7 @@
 layout: post
 title:  "zookeeper-practice"
 date:   2024-01-26 12:00:00 +0800
-categories: zookeeper
+categories: kubernetes
 ---
 
 # 安装NFS
