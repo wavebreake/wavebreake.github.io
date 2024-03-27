@@ -24,8 +24,8 @@ categories: kubernetes
   hosts: masters
   gather_facts: no
   environment:
-    http_proxy: http://127.0.0.1:7890
-    https_proxy: http://127.0.0.1:7890
+    http_proxy: http://127.0.0.1:10809
+    https_proxy: http://127.0.0.1:10809
     no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16  
 
   vars:
@@ -93,8 +93,8 @@ categories: kubernetes
   hosts: k8s
   gather_facts: no
   environment:
-    http_proxy: http://127.0.0.1:7890
-    https_proxy: http://127.0.0.1:7890
+    http_proxy: http://127.0.0.1:10809
+    https_proxy: http://127.0.0.1:10809
     no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
   tasks:
     - name: setenforce 0;swapoff -a
@@ -158,8 +158,8 @@ categories: kubernetes
   hosts: k8s
   gather_facts: no
   environment:
-    http_proxy: http://127.0.0.1:7890
-    https_proxy: http://127.0.0.1:7890
+    http_proxy: http://127.0.0.1:10809
+    https_proxy: http://127.0.0.1:10809
     no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
   tasks:
     - name: mkdir -P /usr/local/lib/systemd/system/
@@ -232,8 +232,8 @@ categories: kubernetes
         create: yes
         block: |
           [Service]
-          Environment="HTTP_PROXY=http://127.0.0.1:7890"
-          Environment="HTTPS_PROXY=http://127.0.0.1:7890"
+          Environment="HTTP_PROXY=http://127.0.0.1:10809"
+          Environment="HTTPS_PROXY=http://127.0.0.1:10809"
           Environment="NO_PROXY=localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
     - name: daemon_reload
@@ -257,8 +257,8 @@ categories: kubernetes
   hosts: k8s
   gather_facts: no
   environment:
-    http_proxy: http://127.0.0.1:7890
-    https_proxy: http://127.0.0.1:7890
+    http_proxy: http://127.0.0.1:10809
+    https_proxy: http://127.0.0.1:10809
     no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
   tasks:
     - name: deploy crictl
@@ -357,8 +357,8 @@ categories: kubernetes
   hosts: masters
   gather_facts: no
   environment:
-    http_proxy: http://127.0.0.1:7890
-    https_proxy: http://127.0.0.1:7890
+    http_proxy: http://127.0.0.1:10809
+    https_proxy: http://127.0.0.1:10809
     no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
   tasks:    
     - name: kubeadm init --pod-network-cidr=10.244.0.0/16

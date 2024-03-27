@@ -17,7 +17,7 @@ categories: kubernetes
         name: metallb
         repo_url: "https://metallb.github.io/metallb"
       environment:
-        https_proxy: http://127.0.0.1:7890
+        https_proxy: http://127.0.0.1:10809
 
     - name: helm install metallb metallb/metallb
       kubernetes.core.helm:
@@ -26,7 +26,7 @@ categories: kubernetes
         release_namespace: metallb-system
         wait: true
       environment:
-        https_proxy: http://127.0.0.1:7890
+        https_proxy: http://127.0.0.1:10809
 
     - name: IPAddressPool
       kubernetes.core.k8s:

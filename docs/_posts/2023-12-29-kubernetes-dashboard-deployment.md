@@ -24,7 +24,7 @@ categories: kubernetes
         name: kubernetes-dashboard
         repo_url: "https://kubernetes.github.io/dashboard/"
       environment:
-        https_proxy: http://127.0.0.1:7890
+        https_proxy: http://127.0.0.1:10809
 
     - name: helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --namespace kubernetes-dashboard
       kubernetes.core.helm:
@@ -32,7 +32,7 @@ categories: kubernetes
         chart_ref: kubernetes-dashboard/kubernetes-dashboard
         release_namespace: kubernetes-dashboard
       environment:
-        https_proxy: http://127.0.0.1:7890
+        https_proxy: http://127.0.0.1:10809
 
     - name: ServiceAccount
       kubernetes.core.k8s:

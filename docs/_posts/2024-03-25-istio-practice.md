@@ -111,11 +111,11 @@ spec:
 EOF
 ```
 
-由于istio-gateway的service运行在kind中，我们无法直接从个人电脑访问，简单地修改istio-gateway的deployment(containerPort: 8080映射到hostPort: 80,containerPort: 8443映射到hostPort: 443)，再通过podman的http映射(containerPort: 80映射到hostPort: 9090,containerPort: 443映射到hostPort: 9443)访问
+由于istio-gateway的service运行在kind中，我们无法直接从个人电脑访问，简单地修改istio-gateway的deployment(containerPort: 80映射到hostPort: 80,containerPort: 443映射到hostPort: 443)，再通过podman的http映射(containerPort: 80映射到hostPort: 9090,containerPort: 443映射到hostPort: 9443)访问
 
-# 使用kiali
+# 使用istio
 
-创建kiali的HTTPRoute
+istio可集成这些组件,通过创建这些组件的httproute,可以使用GUI,例如kiali,使用浏览器打开http://local.projectcontour.io:9090/kiali
 
 ```
 kubectl apply -f - <<EOF
@@ -141,43 +141,18 @@ spec:
 EOF
 ```
 
-访问kiali服务,使用浏览器打开http://local.projectcontour.io:9090/kiali
+|                   | metadata.name     | metadata.namespace | spec.rules.matches.path.type | spec.rules.matches.path.value | spec.rules.backendRefs.name | spec.rules.backendRefs.port |
+| ----------------- | ----------------- | ------------------ | ---------------------------- | ----------------------------- | --------------------------- | --------------------------- |
+| Kiali             | kiali-httproute   | istio-system       | PathPrefix                   | /kiali                        | kiali                       | 20001                       |
+| Jaeger            | tracing-httproute | istio-system       | PathPrefix                   | /tracing                      | tracing                     | 80                          |
+| Zipkin            | tracing-httproute | istio-system       | PathPrefix                   | /tracing                      | tracing                     | 80                          |
+| Apache SkyWalking | tracing-httproute | istio-system       | PathPrefix                   | /tracing                      | tracing-ui                  | 8080                        |
+| Grafana           |                   |                    |                              |                               |                             |                             |
+| Prometheus        |                   |                    |                              |                               |                             |                             |
+| cert-manager      |                   |                    |                              |                               |                             |                             |
+| SPIRE             |                   |                    |                              |                               |                             |                             |
 
-![istio_3](https://raw.githubusercontent.com/wavebreake/imagehosting/main/istio_3.jpeg)
 
-# 使用jaeger
-
-创建jaeger的HTTPRoute
-
-```
-kubectl apply -f - <<EOF
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: jaeger-httproute
-  namespace: istio-system
-spec:
-  parentRefs:
-  - name: istio-gateway
-    namespace: istio-ingress
-  hostnames: 
-  - "local.projectcontour.io"
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /jaeger
-    backendRefs:
-    - name: tracing
-      port: 80
-EOF
-```
-
-访问jaeger服务,使用浏览器打开http://local.projectcontour.io:9090/jaeger
-
-![istio_1](https://raw.githubusercontent.com/wavebreake/imagehosting/main/istio_1.jpeg)
-
-![istio_2](https://raw.githubusercontent.com/wavebreake/imagehosting/main/istio_2.jpeg)
 
 # 上面测试用的应用bookinfo
 
@@ -225,7 +200,5 @@ EOF
 ```
 
 访问bookinfo服务,使用浏览器打开http://local.projectcontour.io:9090/productpage
-
-![istio](https://raw.githubusercontent.com/wavebreake/imagehosting/main/istio.jpeg)
 
 不停使用F5刷新，观察kiali和jaeger

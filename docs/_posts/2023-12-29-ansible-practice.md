@@ -55,8 +55,8 @@ vim playbook.yaml
   hosts: k8s
   gather_facts: no
   environment:
-    http_proxy: http://127.0.0.1:7890
-    https_proxy: http://127.0.0.1:7890
+    http_proxy: http://127.0.0.1:10809
+    https_proxy: http://127.0.0.1:10809
     no_proxy: localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
   tasks:
     - name: apt update
