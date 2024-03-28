@@ -144,15 +144,23 @@ EOF
 |                   | metadata.name     | metadata.namespace | spec.rules.matches.path.type | spec.rules.matches.path.value | spec.rules.backendRefs.name | spec.rules.backendRefs.port |
 | ----------------- | ----------------- | ------------------ | ---------------------------- | ----------------------------- | --------------------------- | --------------------------- |
 | Kiali             | kiali-httproute   | istio-system       | PathPrefix                   | /kiali                        | kiali                       | 20001                       |
-| Jaeger            | tracing-httproute | istio-system       | PathPrefix                   | /tracing                      | tracing                     | 80                          |
-| Zipkin            | tracing-httproute | istio-system       | PathPrefix                   | /tracing                      | tracing                     | 80                          |
-| Apache SkyWalking | tracing-httproute | istio-system       | PathPrefix                   | /tracing                      | tracing-ui                  | 8080                        |
-| Grafana           |                   |                    |                              |                               |                             |                             |
+| Jaeger            | tracing-httproute | istio-system       | PathPrefix                   | /jaeger                       | tracing                     | 80                          |
+| Zipkin            | tracing-httproute | istio-system       | PathPrefix                   | /zipkin                       | tracing                     | 80                          |
+| Apache SkyWalking | tracing-httproute | istio-system       | PathPrefix                   | /                             | tracing-ui                  | 8080                        |
+| Grafana           | grafana-httproute | istio-system       | PathPrefix                   | /                             | grafana                     | 3000                        |
 | Prometheus        |                   |                    |                              |                               |                             |                             |
 | cert-manager      |                   |                    |                              |                               |                             |                             |
 | SPIRE             |                   |                    |                              |                               |                             |                             |
 
+![istio_1](https://raw.githubusercontent.com/wavebreake/imagehosting/main/istio_1.jpeg)
 
+![istio_2](https://raw.githubusercontent.com/wavebreake/imagehosting/main/istio_2.jpeg)
+
+![istio_3](https://raw.githubusercontent.com/wavebreake/imagehosting/main/istio_3.jpeg)
+
+![istio_4](https://raw.githubusercontent.com/wavebreake/imagehosting/main/istio_4.jpeg)
+
+![istio_5](https://raw.githubusercontent.com/wavebreake/imagehosting/main/istio_5.jpeg)
 
 # 上面测试用的应用bookinfo
 
@@ -201,4 +209,6 @@ EOF
 
 访问bookinfo服务,使用浏览器打开http://local.projectcontour.io:9090/productpage
 
-不停使用F5刷新，观察kiali和jaeger
+不停使用F5刷新，观察kiali,jaeger,zipkin,skywalking,grafana等
+
+![istio](https://raw.githubusercontent.com/wavebreake/imagehosting/main/istio.jpeg)
